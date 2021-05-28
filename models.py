@@ -6,9 +6,10 @@ db = MongoAlchemy()
 
 
 class User(db.Document):
-    public_id = db.IntField()
+    public_id = db.StringField()
     username = db.StringField()
     password = db.StringField()
+    is_admin = db.BoolField()
 
 
 class Brand(db.Document):
