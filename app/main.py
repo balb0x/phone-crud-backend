@@ -15,7 +15,7 @@ from validations import validate_password, check_parameter
 
 app = Flask(__name__)
 app.config[MONGOALCHEMY_DATABASE] = 'phone-crud'
-app.config[MONGOALCHEMY_CONNECTION_STRING] = 'mongodb://127.0.0.1:27017/phone-crud'
+app.config[MONGOALCHEMY_CONNECTION_STRING] = 'mongodb://mongodb:27017/phone-crud'
 app.config[SECRET_KEY] = 'jWu74U$F<.W(*PSs'
 
 db.init_app(app)
@@ -504,4 +504,4 @@ def remove_phones():
     return DataResponse({RESULTS: ids}).make()
 
 
-app.run()
+app.run(host="0.0.0.0")

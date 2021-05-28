@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  mongodb:
+    image: mongo:latest
+  backend:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      WAIT_HOSTS: mongodb:27017
+    depends_on:
+      - mongodb
