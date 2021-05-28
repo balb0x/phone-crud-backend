@@ -4,7 +4,7 @@ from functools import wraps
 from flask import Flask, request, make_response
 from constants import *
 from models import db, User, Brand, Phone
-from bson.json_util import dumps
+from responses import *
 from util import wrap_result
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -39,18 +39,19 @@ def token_required(admin_required=False):
                 token = request.headers[AUTHORIZATION].replace(BEARER_REPLACE, "")
             if not token:
                 # No token given, return an error
-                return dumps({'message': 'a valid token is missing'})
+                return UnauthorizedResponse('a valid token is missing').make()
             try:
                 # Try to decode the given token, if there is an error, return an exception
                 data = jwt.decode(token, app.config[SECRET_KEY], algorithms="HS256")
                 current_user = User.query.filter_by(public_id=data[PUBLIC_ID]).first()
                 if current_user is None:
-                    return dumps({'message': 'user is invalid'})
+                    return UnauthorizedResponse('user is invalid').make()
                 # check if the user has enough privileges
                 elif admin_required and not current_user.is_admin:
-                    return dumps({'message': 'unprivileged user'})
+                    return UnauthorizedResponse('unprivileged user').make()
             except:
-                return dumps({'message': 'token is invalid'})
+                return UnauthorizedResponse('token is invalid').make()
+
             return func(current_user, *args, **kwargs)
 
         return wrapper
@@ -74,7 +75,7 @@ def signup_user():
 
     # check for the needed parameters
     if not validate_password(data) or not check_parameter(data, USERNAME, 4, 16):
-        return make_response(dumps({"message": "Invalid payload"}), 401)
+        return BadRequestResponse('Invalid payload').make()
 
     # hash the password to store it later
     hashed_password = generate_password_hash(data[PASSWORD], method='sha256')
@@ -83,7 +84,7 @@ def signup_user():
     new_user = User(public_id=str(uuid.uuid4()), username=data[USERNAME], password=hashed_password, is_admin=False)
     new_user.save()
 
-    return dumps({'message': 'registered successfully'})
+    return SuccessResponse('registered successfully').make()
 
 
 @app.route('/api/login', methods=['POST'])
@@ -97,7 +98,7 @@ def login_user():
 
     # if the request doesn't have a Basic Authentication header, then discard it
     if not auth or not auth.username or not auth.password:
-        return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
+        return UnauthorizedResponse('could not verify').make()
 
     # filter the user by the given username
     user = User.query.filter_by(username=auth.username).first()
@@ -107,9 +108,9 @@ def login_user():
         token = jwt.encode(
             {PUBLIC_ID: user.public_id, EXP: datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
             app.config[SECRET_KEY])
-        return dumps({TOKEN: token})
+        return DataResponse({TOKEN: token}).make()
 
-    return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
+    return UnauthorizedResponse('could not verify').make()
 
 
 """
@@ -131,7 +132,7 @@ def list_brand(current_user):
     rows = request.args.get(ROWS, ROWS_PER_PAGE, type=int)
 
     result = wrap_result(Brand.query.paginate(page=page, per_page=rows).items)
-    return dumps({RESULTS: result, TOTAL: Brand.query.count()})
+    return DataResponse({RESULTS: result, TOTAL: Brand.query.count()}).make()
 
 
 @app.route("/api/brand", methods=['POST'])
@@ -144,17 +145,17 @@ def create_brand(current_user):
     :return: Status of the request
     """
     if not check_parameter(request.json, NAME, 2, 15):
-        return dumps({'message': 'Invalid payload'})
+        return BadRequestResponse('Invalid payload').make()
 
     name = request.json[NAME]
     brand = Brand.query.filter(Brand.name == name).first()
     if brand is not None:
-        return dumps({'message': 'Existing brand'})
+        return BadRequestResponse('Existing brand').make()
 
     # retrieve the brand name from the request, create a new Brand object and save it
     brand = Brand(name=name)
     brand.save()
-    return dumps({'message': 'saved successfully'})
+    return SuccessResponse('Saved successfully').make()
 
 
 @app.route("/api/brand/<_id>", methods=['PUT'])
@@ -169,15 +170,15 @@ def update_brand(_id, current_user):
     """
 
     if not check_parameter(request.json, NAME, 2, 15):
-        return dumps({'message': 'Invalid payload'})
+        return BadRequestResponse('Invalid payload').make()
 
     name = request.json[NAME]
     brand = Brand.query.filter(Brand.mongo_id == _id).first()
     if brand is None:
-        return dumps({'message': 'Brand does not exist'})
+        return BadRequestResponse('Brand does not exist').make()
     brand.name = name
     brand.save()
-    return dumps({'message': 'updated successfully'})
+    return SuccessResponse('updated successfully').make()
 
 
 @app.route("/api/brand/<_id>", methods=['DELETE'])
@@ -192,9 +193,9 @@ def remove_brand(_id, current_user):
     """
     brand = Brand.query.filter(Brand.mongo_id == _id).first()
     if brand is None:
-        return dumps({'message': 'Brand does not exist'})
+        return BadRequestResponse('Brand does not exist').make()
     brand.remove()
-    return dumps({'message': 'deleted successfully'})
+    return SuccessResponse('deleted successfully').make()
 
 
 """
@@ -216,7 +217,7 @@ def list_phone(current_user):
     rows = request.args.get(ROWS, ROWS_PER_PAGE, type=int)
 
     result = wrap_result(Phone.query.paginate(page=page, per_page=rows).items)
-    return dumps({RESULTS: result, TOTAL: Phone.query.count()})
+    return DataResponse({RESULTS: result, TOTAL: Phone.query.count()}).make()
 
 
 @app.route("/api/phone", methods=['POST'])
@@ -231,17 +232,17 @@ def create_phone(current_user):
     """
 
     if not check_parameter(request.json, NAME, 2, 15) or not check_parameter(request.json, BRAND_NAME, 2, 15):
-        return dumps({'message': 'Invalid payload'})
+        return BadRequestResponse('Invalid payload').make()
 
     name = request.json[NAME]
     brand_name = request.json[BRAND_NAME]
     brand = Brand.query.filter(Brand.name == brand_name).first()
     if brand is None:
-        return dumps({'message': 'Brand does not exist'})
+        return BadRequestResponse('Brand does not exist').make()
 
     phone = Phone(name=name, brand=brand)
     phone.save()
-    return dumps({'message': 'saved successfully'})
+    return SuccessResponse('Saved successfully').make()
 
 
 @app.route("/api/phone/<_id>", methods=['PUT'])
@@ -254,21 +255,22 @@ def update_phone(_id, current_user):
     :param current_user: The user who makes the call
     :return: Status of the request
     """
+
     name = request.json[NAME]
     brand_name = request.json[BRAND_NAME]
     if not check_parameter(request.json, NAME, 2, 15) or not check_parameter(request.json, BRAND_NAME, 2, 15):
-        return dumps({'message': 'Invalid payload'})
+        return BadRequestResponse('Invalid payload').make()
 
     brand = Brand.query.filter(Brand.name == brand_name).first()
     phone = Phone.query.filter(Phone.mongo_id == _id).first()
 
     if brand is None or phone is None:
-        return dumps({'message': 'One of the elements does not exist'})
+        return BadRequestResponse('One of the elements does not exist').make()
 
     phone.name = name
     phone.brand = brand
     phone.save()
-    return dumps({'message': 'updated successfully'})
+    return SuccessResponse('Updated successfully').make()
 
 
 @app.route("/api/phone/<_id>", methods=['DELETE'])
@@ -283,10 +285,10 @@ def remove_phone(_id, current_user):
     """
     phone = Phone.query.filter(Phone.mongo_id == _id).first()
     if phone is None:
-        return dumps({'message': 'Phone does not exist'})
+        return BadRequestResponse('Phone does not exist').make()
 
     phone.remove()
-    return dumps({'message': 'deleted successfully'})
+    return SuccessResponse('Deleted successfully').make()
 
 
 app.run()

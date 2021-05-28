@@ -9,7 +9,7 @@ def validate_password(data):
     if "password" not in data:
         return False
     password = data["password"]
-    if 4 < len(password) < 16:
+    if len(password) < 4 or len(password) > 16:
         return False
 
     return True
