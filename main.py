@@ -1,7 +1,7 @@
 import datetime
 import uuid
 from functools import wraps
-from flask import Flask, request, make_response
+from flask import Flask, request
 from constants import *
 from models import db, User, Brand, Phone
 from responses import *
