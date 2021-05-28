@@ -59,6 +59,19 @@ def token_required(admin_required=False):
     return real_decorator
 
 
+@app.before_first_request
+def before_first_request():
+    if User.query.count() == 0:
+        # For testing purposes only:
+        # Check if there are users in the database, if not, create a default admin account
+        user = User(
+            username="admin",
+            password=generate_password_hash("password", method='sha256'),
+            public_id=str(uuid.uuid4()),
+            is_admin=True)
+        user.save()
+
+
 """
 Login methods
 """
