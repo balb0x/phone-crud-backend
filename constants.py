@@ -13,3 +13,11 @@ EXP = 'exp'
 TOKEN = 'token'
 NAME = 'name'
 BRAND_NAME = 'brandName'
+ROWS = 'rows'
+PAGE = 'page'
+RESULTS = 'results'
+COUNT = 'count'
+TOTAL = 'total'
+
+
+ROWS_PER_PAGE = 5

@@ -121,14 +121,17 @@ Brand methods
 @token_required(admin_required=True)
 def list_brand(current_user):
     """
-    Lists all the brands with no filter
-    TODO make a pagination system
+    Lists all the brands with a pagination filter
     :param current_user: The user who makes the call
     :return: Status of the request
     """
     # query the Brand model with no filter and return the data wrapped
-    result = wrap_result(Brand.query.all())
-    return dumps(result)
+
+    page = request.args.get(PAGE, 1, type=int)
+    rows = request.args.get(ROWS, ROWS_PER_PAGE, type=int)
+
+    result = wrap_result(Brand.query.paginate(page=page, per_page=rows).items)
+    return dumps({RESULTS: result, TOTAL: Brand.query.count()})
 
 
 @app.route("/api/brand", methods=['POST'])
@@ -203,14 +206,17 @@ Phone methods
 @token_required()
 def list_phone(current_user):
     """
-    Lists all the phone records on the database with no filter
+    Lists all the phone records on the database with a pagination filter
 
-    TODO implement a pagination system
     :param current_user: The user who makes the call
     :return: All the phone records
     """
-    result = wrap_result(Phone.query.all())
-    return dumps(result)
+
+    page = request.args.get(PAGE, 1, type=int)
+    rows = request.args.get(ROWS, ROWS_PER_PAGE, type=int)
+
+    result = wrap_result(Phone.query.paginate(page=page, per_page=rows).items)
+    return dumps({RESULTS: result, TOTAL: Phone.query.count()})
 
 
 @app.route("/api/phone", methods=['POST'])
@@ -244,7 +250,6 @@ def update_phone(_id, current_user):
     """
     Updates the information of the phone
 
-    TODO check if the information if valid
     :param _id: Phone id to be modified
     :param current_user: The user who makes the call
     :return: Status of the request
