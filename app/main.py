@@ -59,6 +59,13 @@ def token_required(admin_required=False):
     return real_decorator
 
 
+@app.after_request # blueprint can also be app~~
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
 @app.before_first_request
 def before_first_request():
     if User.query.count() == 0:
@@ -107,17 +114,19 @@ def login_user():
     and return it.
     :return: status of the request or the user token
     """
-    auth = request.authorization
 
     # if the request doesn't have a Basic Authentication header, then discard it
-    if not auth or not auth.username or not auth.password:
+    if not check_parameter(request.json, USERNAME) or not check_parameter(request.json, PASSWORD):
         return UnauthorizedResponse('could not verify').make()
 
+    username = request.json[USERNAME]
+    password = request.json[PASSWORD]
+
     # filter the user by the given username
-    user = User.query.filter_by(username=auth.username).first()
+    user = User.query.filter_by(username=username).first()
 
     # check if the hash of the given password matches the user stored one
-    if check_password_hash(user.password, auth.password):
+    if check_password_hash(user.password, password):
         token = jwt.encode(
             {PUBLIC_ID: user.public_id, EXP: datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
             app.config[SECRET_KEY])
