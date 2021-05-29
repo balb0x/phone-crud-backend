@@ -3,7 +3,7 @@ import uuid
 from functools import wraps
 from flask import Flask, request
 
-from app.initial_data import start_data
+from initial_data import start_data
 from constants import *
 from models import db, User, Brand, Phone
 from responses import *
