@@ -167,7 +167,9 @@ def login_user():
         # check if the hash of the given password matches the user stored one
         if check_password_hash(user.password, password):
             token = jwt.encode(
-                {PUBLIC_ID: user.public_id, ROLE: ADMIN if user.is_admin else OPERATOR, EXP: datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
+                {PUBLIC_ID: user.public_id,
+                 ROLE: ADMIN if user.is_admin else OPERATOR,
+                 EXP: datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
                 app.config[SECRET_KEY])
             return DataResponse({TOKEN: token}).make()
 
@@ -331,7 +333,6 @@ def remove_brands():
     """
     Removes the document of the given Brand.
 
-    :param _id: Identifier of the brand
     :return: Status of the request
     """
     ids_param = request.args.get(IDS, "", type=str)
@@ -401,7 +402,7 @@ def check_phone_parameters(request):
 def assign_parameters_to_phone(phone, request):
     """
     Assing the parameters of a request to a given phone
-    :param brand: Phone to modigy
+    :param phone: Phone to modify
     :param request: Request containing all the parameters
     """
     name = request.json[NAME]
@@ -492,7 +493,6 @@ def remove_phones():
     """
     Deletes the phones entries from the database
 
-    :param _id:
     :return:
     """
     ids_param = request.args.get(IDS, "", type=str)
