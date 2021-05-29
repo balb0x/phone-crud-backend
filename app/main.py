@@ -321,7 +321,7 @@ def remove_brands():
         brand = Brand.query.filter(Brand.mongo_id == _id).first()
         if brand is not None:
             brand.remove()
-    return SuccessResponse('deleted successfully').make()
+    return DataResponse({RESULTS: ids}).make()
 
 
 """
@@ -482,7 +482,7 @@ def remove_phones():
         phone = Phone.query.filter(Phone.mongo_id == _id).first()
         if phone is not None:
             phone.remove()
-    return SuccessResponse('Deleted successfully').make()
+    return DataResponse({RESULTS: ids}).make()
 
 
 app.run()
