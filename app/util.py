@@ -7,5 +7,5 @@ def wrap_result(query):
     """
     results = []
     for row in query:
-        results.append(row.wrap())
+        results.append(row.to_json())
     return results
