@@ -203,6 +203,43 @@ def get_brand(_id):
         return BadRequestResponse('Invalid payload').make()
 
 
+def check_brand_parameters(request):
+    """
+    Function to check if the parameters of a given brand are valid
+    :param request: request object containing all the parameters
+    :return: Error if exists, if not, None
+    """
+    if not check_parameter(request.json, NAME, 2, 15) \
+            or not check_parameter(request.json, COUNTRY, 2, 15) \
+            or not check_parameter(request.json, YEAR) \
+            or not check_parameter(request.json, CEO, 2, 15) \
+            or not check_parameter(request.json, ENTRY) \
+            or not check_parameter(request.json, ISIN, 3, 20):
+        return BadRequestResponse('Invalid payload').make()
+    return None
+
+
+def assign_parameters_to_brand(brand, request):
+    """
+    Assing the parameters of a request to a given brand
+    :param brand: Brand to modigy
+    :param request: Request containing all the parameters
+    """
+    name = request.json[NAME]
+    country = request.json[COUNTRY]
+    year = request.json[YEAR]
+    ceo = request.json[CEO]
+    entry = request.json[ENTRY]
+    isin = request.json[ISIN]
+
+    brand.name = name
+    brand.country = country
+    brand.year = year
+    brand.ceo = ceo
+    brand.entry = entry
+    brand.isin = isin
+
+
 @app.route("/api/brand", methods=['POST'])
 @token_required(admin_required=True)
 def create_brand():
@@ -211,8 +248,9 @@ def create_brand():
 
     :return: Status of the request
     """
-    if not check_parameter(request.json, NAME, 2, 15):
-        return BadRequestResponse('Invalid payload').make()
+    check = check_brand_parameters(request)
+    if check is not None:
+        return check
 
     name = request.json[NAME]
     brand = Brand.query.filter(Brand.name == name).first()
@@ -221,6 +259,7 @@ def create_brand():
 
     # retrieve the brand name from the request, create a new Brand object and save it
     brand = Brand(name=name)
+    assign_parameters_to_brand(brand, request)
     brand.save()
     return DataResponse({RESULTS: brand.to_json()}).make()
 
@@ -235,20 +274,20 @@ def update_brand(_id):
     :return: Status of the request
     """
 
-    if not check_parameter(request.json, NAME, 2, 15):
-        return BadRequestResponse('Invalid payload').make()
+    check = check_brand_parameters(request)
+    if check is not None:
+        return check
 
-    name = request.json[NAME]
     brand = Brand.query.filter(Brand.mongo_id == _id).first()
     if brand is None:
         return BadRequestResponse('Brand does not exist').make()
-    brand.name = name
+    assign_parameters_to_brand(brand, request)
     brand.save()
     phones = Phone.query.filter(Phone.brand.mongo_id == _id).all()
     for phone in phones:
         phone.brand = brand
         phone.save()
-    return SuccessResponse('updated successfully').make()
+    return DataResponse({RESULTS: brand.to_json()}).make()
 
 
 @app.route("/api/brand/<_id>", methods=['DELETE'])

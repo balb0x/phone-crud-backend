@@ -24,5 +24,10 @@ TOTAL = 'total'
 ROLE = 'permissions'
 ADMIN = 'admin'
 OPERATOR = 'operator'
+COUNTRY = 'country'
+YEAR = 'year'
+CEO = 'ceo'
+ENTRY = 'entry'
+ISIN = 'isin'
 
 ROWS_PER_PAGE = 5

@@ -55,6 +55,11 @@ class Brand(BaseDocument):
     Class to store the brand information.
     """
     name = db.StringField()
+    country = db.StringField()
+    year = db.IntField()
+    ceo = db.StringField()
+    entry = db.IntField()
+    isin = db.StringField()
 
 
 class Phone(BaseDocument):
