@@ -2,6 +2,8 @@ import datetime
 import uuid
 from functools import wraps
 from flask import Flask, request
+
+from app.initial_data import start_data
 from constants import *
 from models import db, User, Brand, Phone
 from responses import *
@@ -84,19 +86,36 @@ def before_first_request():
     if User.query.count() == 0:
         # For testing purposes only:
         # Check if there are users in the database, if not, create a default admin account
-        user = User(
-            username="admin",
-            password=generate_password_hash("password", method='sha256'),
-            public_id=str(uuid.uuid4()),
-            is_admin=True)
-        user.save()
-
-        user = User(
-            username="operator",
-            password=generate_password_hash("password", method='sha256'),
-            public_id=str(uuid.uuid4()),
-            is_admin=False)
-        user.save()
+        user_data = start_data["users"]
+        for u_data in user_data:
+            user = User(
+                username=u_data["username"],
+                password=generate_password_hash(u_data["password"], method='sha256'),
+                public_id=str(uuid.uuid4()),
+                is_admin=u_data["is_admin"])
+            user.save()
+        if Phone.query.count() == 0 and Brand.query.count() == 0:
+            brand_data = start_data["brands"]
+            for b_data in brand_data:
+                brand = Brand(
+                    name=b_data["name"],
+                    country=b_data["country"],
+                    year=b_data["year"],
+                    ceo=b_data["ceo"],
+                    entry=b_data["entry"],
+                    isin=b_data["isin"]
+                )
+                brand.save()
+                for p_data in b_data["phones"]:
+                    phone = Phone(
+                        name=p_data["name"],
+                        so=p_data["so"],
+                        water_proof=p_data["water_proof"],
+                        h5g=p_data["h5g"],
+                        ram=p_data["ram"],
+                        brand=brand
+                    )
+                    phone.save()
 
 
 """
