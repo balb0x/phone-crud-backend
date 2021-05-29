@@ -25,7 +25,6 @@ class BaseDocument(db.Document):
             field = getattr(cls, name)
             try:
                 value = getattr(self, name)
-                print(field.db_field)
                 if isinstance(value, BaseDocument):
                     res[field.db_field] = value.to_json()
                 elif field.db_field == '_id':
