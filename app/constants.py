@@ -21,6 +21,8 @@ PAGE = 'page'
 RESULTS = 'results'
 COUNT = 'count'
 TOTAL = 'total'
-
+ROLE = 'permissions'
+ADMIN = 'admin'
+OPERATOR = 'operator'
 
 ROWS_PER_PAGE = 5

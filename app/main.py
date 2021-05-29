@@ -91,6 +91,13 @@ def before_first_request():
             is_admin=True)
         user.save()
 
+        user = User(
+            username="operator",
+            password=generate_password_hash("password", method='sha256'),
+            public_id=str(uuid.uuid4()),
+            is_admin=False)
+        user.save()
+
 
 """
 Login methods
@@ -141,7 +148,7 @@ def login_user():
         # check if the hash of the given password matches the user stored one
         if check_password_hash(user.password, password):
             token = jwt.encode(
-                {PUBLIC_ID: user.public_id, EXP: datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
+                {PUBLIC_ID: user.public_id, ROLE: ADMIN if user.is_admin else OPERATOR, EXP: datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
                 app.config[SECRET_KEY])
             return DataResponse({TOKEN: token}).make()
 
