@@ -63,3 +63,12 @@ class UnauthorizedResponse(MessageResponse):
         super().__init__(401, message)
 
 
+class ForbiddenResponse(MessageResponse):
+    """
+        Class which extends MessageResponse. Returns a 401 code
+        and accepts a simple message
+        """
+    def __init__(self, message):
+        super().__init__(403, message)
+
+

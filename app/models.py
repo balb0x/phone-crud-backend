@@ -68,3 +68,7 @@ class Phone(BaseDocument):
     """
     name = db.StringField()
     brand = db.DocumentField(Brand)
+    so = db.StringField()
+    water_proof = db.BoolField()
+    h5g = db.BoolField()
+    ram = db.IntField()

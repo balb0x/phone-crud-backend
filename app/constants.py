@@ -29,5 +29,8 @@ YEAR = 'year'
 CEO = 'ceo'
 ENTRY = 'entry'
 ISIN = 'isin'
-
+SO = 'so'
+WATER_PROOF = 'water_proof'
+H5G = 'h5g'
+RAM = 'ram'
 ROWS_PER_PAGE = 5

@@ -48,7 +48,7 @@ def token_required(admin_required=False):
                     return UnauthorizedResponse('user is invalid').make()
                 # check if the user has enough privileges
                 elif admin_required and not current_user.is_admin:
-                    return UnauthorizedResponse('unprivileged user').make()
+                    return ForbiddenResponse('unprivileged user').make()
             except:
                 return UnauthorizedResponse('token is invalid').make()
 
@@ -161,7 +161,7 @@ Brand methods
 
 
 @app.route("/api/brand", methods=['GET'])
-@token_required(admin_required=True)
+@token_required()
 def list_brand():
     """
     Lists all the brands with a pagination filter
@@ -362,6 +362,42 @@ def get_phone(_id):
         return BadRequestResponse('Invalid payload').make()
 
 
+def check_phone_parameters(request):
+    """
+    Function to check if the parameters of a given phone are valid
+    :param request: request object containing all the parameters
+    :return: Error if exists, if not, None
+    """
+    if not check_parameter(request.json, NAME, 2, 15) \
+            or not check_parameter(request.json, BRAND) \
+            or not check_parameter(request.json[BRAND], ID) \
+            or not check_parameter(request.json, SO, 1, 10) \
+            or not check_parameter(request.json, WATER_PROOF) \
+            or not check_parameter(request.json, H5G) \
+            or not check_parameter(request.json, RAM):
+        return BadRequestResponse('Invalid payload').make()
+    return None
+
+
+def assign_parameters_to_phone(phone, request):
+    """
+    Assing the parameters of a request to a given phone
+    :param brand: Phone to modigy
+    :param request: Request containing all the parameters
+    """
+    name = request.json[NAME]
+    so = request.json[SO]
+    water_proof = request.json[WATER_PROOF]
+    h5g = request.json[H5G]
+    ram = request.json[RAM]
+
+    phone.name = name
+    phone.so = so
+    phone.water_proof = water_proof
+    phone.h5g = h5g
+    phone.ram = ram
+
+
 @app.route("/api/phone", methods=['POST'])
 @token_required()
 def create_phone():
@@ -372,18 +408,17 @@ def create_phone():
     :return: Status of the request
     """
 
-    if not check_parameter(request.json, NAME, 2, 15) \
-            or not check_parameter(request.json, BRAND) \
-            or not check_parameter(request.json[BRAND], ID):
-        return BadRequestResponse('Invalid payload').make()
+    check = check_phone_parameters(request)
+    if check is not None:
+        return check
 
-    name = request.json[NAME]
     brand_id = request.json[BRAND][ID]
     brand = Brand.query.filter(Brand.mongo_id == brand_id).first()
     if brand is None:
         return BadRequestResponse('Brand does not exist').make()
 
-    phone = Phone(name=name, brand=brand)
+    phone = Phone(brand=brand)
+    assign_parameters_to_phone(phone, request)
     phone.save()
     return DataResponse({RESULTS: phone.to_json()}).make()
 
@@ -398,13 +433,10 @@ def update_phone(_id):
     :return: Status of the request
     """
 
-    name = request.json[NAME]
-    if not check_parameter(request.json, NAME, 2, 15) \
-            or not check_parameter(request.json, BRAND) \
-            or not check_parameter(request.json[BRAND], ID, 2, 30):
-        return BadRequestResponse('Invalid payload').make()
+    check = check_phone_parameters(request)
+    if check is not None:
+        return check
 
-    name = request.json[NAME]
     brand_id = request.json[BRAND][ID]
     brand = Brand.query.filter(Brand.mongo_id == brand_id).first()
     phone = Phone.query.filter(Phone.mongo_id == _id).first()
@@ -412,8 +444,8 @@ def update_phone(_id):
     if brand is None or phone is None:
         return BadRequestResponse('One of the elements does not exist').make()
 
-    phone.name = name
     phone.brand = brand
+    assign_parameters_to_phone(phone, request)
     phone.save()
     return DataResponse({RESULTS: phone.to_json()}).make()
 
