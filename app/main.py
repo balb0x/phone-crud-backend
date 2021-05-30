@@ -1,6 +1,8 @@
 import datetime
 import uuid
 from functools import wraps
+
+from bson import ObjectId
 from flask import Flask, request
 import os
 from initial_data import start_data
@@ -244,6 +246,8 @@ def get_brand(_id):
     :param _id: Brand id to be queried
     :return: All the phone records
     """
+    if not ObjectId.is_valid(_id):
+        return BadRequestResponse('Invalid payload').make()
 
     brand = Brand.query.filter(Brand.mongo_id == _id).first()
     if brand is not None:
@@ -327,6 +331,9 @@ def update_brand(_id):
     if check is not None:
         return check
 
+    if not ObjectId.is_valid(_id):
+        return BadRequestResponse('Invalid payload').make()
+
     brand = Brand.query.filter(Brand.mongo_id == _id).first()
     if brand is None:
         return BadRequestResponse('Brand does not exist').make()
@@ -348,6 +355,10 @@ def remove_brand(_id):
     :param _id: Identifier of the brand
     :return: Status of the request
     """
+
+    if not ObjectId.is_valid(_id):
+        return BadRequestResponse('Invalid payload').make()
+
     brand = Brand.query.filter(Brand.mongo_id == _id).first()
     if brand is None:
         return BadRequestResponse('Brand does not exist').make()
@@ -359,16 +370,17 @@ def remove_brand(_id):
 @token_required(admin_required=True)
 def remove_brands():
     """
-    Removes the document of the given Brand.
+    Removes the documents of the given Brands.
 
     :return: Status of the request
     """
     ids_param = request.args.get(IDS, "", type=str)
     ids = ids_param.split(",")
     for _id in ids:
-        brand = Brand.query.filter(Brand.mongo_id == _id).first()
-        if brand is not None:
-            brand.remove()
+        if ObjectId.is_valid(_id):
+            brand = Brand.query.filter(Brand.mongo_id == _id).first()
+            if brand is not None:
+                brand.remove()
     return DataResponse({RESULTS: ids}).make()
 
 
@@ -402,6 +414,9 @@ def get_phone(_id):
     :param _id: Phone id to be queried
     :return: All the phone records
     """
+
+    if not ObjectId.is_valid(_id):
+        return BadRequestResponse('Invalid payload').make()
 
     phone = Phone.query.filter(Phone.mongo_id == _id).first()
     if phone is not None:
@@ -461,6 +476,10 @@ def create_phone():
         return check
 
     brand_id = request.json[BRAND][ID]
+
+    if not ObjectId.is_valid(brand_id):
+        return BadRequestResponse('Invalid payload').make()
+
     brand = Brand.query.filter(Brand.mongo_id == brand_id).first()
     if brand is None:
         return BadRequestResponse('Brand does not exist').make()
@@ -486,6 +505,10 @@ def update_phone(_id):
         return check
 
     brand_id = request.json[BRAND][ID]
+
+    if not ObjectId.is_valid(_id) or not ObjectId.is_valid(brand_id):
+        return BadRequestResponse('Invalid payload').make()
+
     brand = Brand.query.filter(Brand.mongo_id == brand_id).first()
     phone = Phone.query.filter(Phone.mongo_id == _id).first()
 
@@ -507,6 +530,10 @@ def remove_phone(_id):
     :param _id:
     :return:
     """
+
+    if not ObjectId.is_valid(_id):
+        return BadRequestResponse('Invalid payload').make()
+
     phone = Phone.query.filter(Phone.mongo_id == _id).first()
     if phone is None:
         return BadRequestResponse('Phone does not exist').make()
@@ -526,9 +553,10 @@ def remove_phones():
     ids_param = request.args.get(IDS, "", type=str)
     ids = ids_param.split(",")
     for _id in ids:
-        phone = Phone.query.filter(Phone.mongo_id == _id).first()
-        if phone is not None:
-            phone.remove()
+        if ObjectId.is_valid(_id):
+            phone = Phone.query.filter(Phone.mongo_id == _id).first()
+            if phone is not None:
+                phone.remove()
     return DataResponse({RESULTS: ids}).make()
 
 
