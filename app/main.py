@@ -2,7 +2,7 @@ import datetime
 import uuid
 from functools import wraps
 from flask import Flask, request
-
+import os
 from initial_data import start_data
 from constants import *
 from models import db, User, Brand, Phone
@@ -13,9 +13,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from validations import validate_password, check_parameter
 
+DOCKER_RUNNING = os.environ.get('DOCKER_RUNNING', False)
+
+# Configure the Flask app
 app = Flask(__name__)
+# Set MongoAlchemy database name
 app.config[MONGOALCHEMY_DATABASE] = 'phone-crud'
-app.config[MONGOALCHEMY_CONNECTION_STRING] = 'mongodb://mongodb:27017/phone-crud'
+# Connect to the MongoDb database
+# If the app is running in the docker container run its url, else, run the local database
+if DOCKER_RUNNING:
+    app.config[MONGOALCHEMY_CONNECTION_STRING] = 'mongodb://mongodb:27017/phone-crud'
+else:
+    app.config[MONGOALCHEMY_CONNECTION_STRING] = 'mongodb://127.0.0.1:27017/phone-crud'
+
+# Set the secret for the JWT authentication
 app.config[SECRET_KEY] = 'jWu74U$F<.W(*PSs'
 
 db.init_app(app)
@@ -63,6 +74,16 @@ def token_required(admin_required=False):
 
 @app.after_request
 def after_request(response):
+    """
+    This function is called after a request is made. It is handled
+    by Flask itself. It is used to prevent CORS errors on the frontend.
+
+    This is a development trick, once the app is loaded on a production
+    server, this has to be configured to fetch the server specifications.
+
+    :param response: Response of the request
+    :return: response: Response of the request
+    """
     origin = request.headers.get('Origin')
     if request.method == 'OPTIONS':
         response = make_response()
@@ -83,6 +104,13 @@ def after_request(response):
 
 @app.before_first_request
 def before_first_request():
+    """
+    This function is called before the first request once the backend
+    has loaded. The purpose of the following lines is to check if the
+    database is empty (Initial launch) and to fill it with the initial
+    data located in the initial_data.py file
+
+    """
     if User.query.count() == 0:
         # For testing purposes only:
         # Check if there are users in the database, if not, create a default admin account
