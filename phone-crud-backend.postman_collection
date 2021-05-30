@@ -1,0 +1,322 @@
+{
+	"info": {
+		"_postman_id": "f276de93-1311-44c6-949b-96c2087b46fe",
+		"name": "Phone CRUD",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/api/login",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\": \"admin\", \"password\": \"password\"}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/phone",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/phone",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"phone"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/phone/id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/phone/60b0c7c27bc3d4683c777b25",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"phone",
+						"60b0c7c27bc3d4683c777b25"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/phone",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"brand\":{\"id\":\"60b25c6b7bc3d45df498fc85\"},\"name\":\"iPhone 6S\",\"so\":\"iOS 10\",\"water_proof\":false,\"h5g\":false,\"ram\":2}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/phone",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"phone"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/phone",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"brand\":{\"id\":\"60b25c6b7bc3d45df498fc85\"},\"name\":\"iPhone 6S\",\"so\":\"iOS 10\",\"water_proof\":false,\"h5g\":false,\"ram\":2}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/phone/60b25c6b7bc3d45df498fc86",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"phone",
+						"60b25c6b7bc3d45df498fc86"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/phone",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/phone/60b25c6b7bc3d45df498fc86",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"phone",
+						"60b25c6b7bc3d45df498fc86"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/brand",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/brand?page=1&rows=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"brand"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "rows",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/brand",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\":\"Sony\",\"country\":\"EEUU\",\"year\":2000,\"ceo\":\"The CEO\",\"entry\":100000,\"isin\":\"US0000000000\"}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/brand",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"brand"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/brand",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\":\"Sony\",\"country\":\"EEUU\",\"year\":2000,\"ceo\":\"The CEO\",\"entry\":100000,\"isin\":\"US0000000000\"}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/brand/60b374d27bc3d46e8c886d80",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"brand",
+						"60b374d27bc3d46e8c886d80"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/brand",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/api/brand/60b090f27bc3d456d02f0637",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"brand",
+						"60b090f27bc3d456d02f0637"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiJkNWY1NzRiMS03OTkzLTRhY2ItOWRlZS03NmEyMDlmYzQ1OWQiLCJwZXJtaXNzaW9ucyI6ImFkbWluIiwiZXhwIjoxNjIyMzc1MTY3fQ.QrqKqTH3-svzLXRXmqpSAwdQ436MMd-ygRxFexZvvLY",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
