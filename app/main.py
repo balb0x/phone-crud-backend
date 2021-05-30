@@ -152,7 +152,7 @@ def before_first_request():
 Login methods
 """
 
-
+'''
 @app.route('/api/register', methods=['POST'])
 def signup_user():
     """
@@ -174,6 +174,7 @@ def signup_user():
     new_user.save()
 
     return SuccessResponse('registered successfully').make()
+'''
 
 
 @app.route('/api/login', methods=['POST'])
