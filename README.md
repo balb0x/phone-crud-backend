@@ -36,6 +36,14 @@ python3 app/main.py
 The backend exposes a simple API rest on port `5000`, to interact with the api you can use Postman and import the provided collection file: `phone-crud-backend.postman_collection`.
 Refer to the project [Wiki/Endpoints](https://github.com/balb0x/phone-crud-backend/wiki/Endpoints) for a more detailed information of the api. 
 
+When started by the first time, the database is empty, there is a part on the code which make an initial insert of the documents. The initial data is found on the `app/initial_data.py`.
+
+The default credentials for the backend are:
+
+```
+admin:password (phone and brand privileges)
+operator:password (phone privileges)
+```
 
 ### License
 
